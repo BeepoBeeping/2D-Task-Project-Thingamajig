@@ -131,11 +131,11 @@ public class PlayerScript : MonoBehaviour
     {
         if (other.gameObject.tag == "Enemy" || other.gameObject.tag == "Lava")
         {
-            SceneManager.LoadScene("LVL_1");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
         if (other.gameObject.tag == "Finish")
         {
-            SceneManager.LoadScene("LVL_2");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
     }
 
