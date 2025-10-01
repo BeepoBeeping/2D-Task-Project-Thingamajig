@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,6 +12,8 @@ public class EnemyScript : MonoBehaviour
     public bool isRight;
     public Animator anim;
     float xvel, yvel;
+    public PlayerScript PlayerScript;
+    HelperScript helper;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -18,8 +21,10 @@ public class EnemyScript : MonoBehaviour
         groundLayer = LayerMask.GetMask("Ground");
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
         xvel = -2.5f;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        helper = gameObject.AddComponent<HelperScript>();
+
     }
  
     public bool ExtendedRayCollisionCheck(float xoffs, float yoffs)
@@ -51,6 +56,8 @@ public class EnemyScript : MonoBehaviour
 
         return hitSomething;
 
+
+
     }
 
 
@@ -58,6 +65,10 @@ public class EnemyScript : MonoBehaviour
     void Update()
 
     {
+        
+
+
+        print("Enemy says: The player has " + PlayerScript.health + "health");
 
         yvel = rb.linearVelocity.y;
          
@@ -68,7 +79,7 @@ public class EnemyScript : MonoBehaviour
             if (ExtendedRayCollisionCheck(-0.5f, 0) == false)
             {
                 xvel = -xvel;
-                isRight = false;
+                helper.DoFlipObject(false);
             }
         }
 
@@ -77,7 +88,7 @@ public class EnemyScript : MonoBehaviour
             if (ExtendedRayCollisionCheck(0.5f, 0) == false)
             {
                 xvel = -xvel;
-                isRight = true;
+                helper.DoFlipObject(true);
             }
         }
 
@@ -85,16 +96,7 @@ public class EnemyScript : MonoBehaviour
         {
             anim.SetBool("isWalking", true);
         }
-
-        if (xvel > 0)
-        {
-            spriteRenderer.flipX = false;
-        }
-        else
-        {
-            spriteRenderer.flipX = true;
-        }
-
+    
         rb.linearVelocity = new Vector3(xvel, yvel, 0);
 
     }

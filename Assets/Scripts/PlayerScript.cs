@@ -16,13 +16,19 @@ public class PlayerScript : MonoBehaviour
     public bool isRight;
     public Animator anim;
     public LayerMask groundLayer;
+    public int health;
+    public int lives;
+    HelperScript helper;
 
     void Start()
     {
+        lives = 3;
+        health = 3;
         rb =  GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         groundLayer = LayerMask.GetMask("Ground");
+        helper = gameObject.AddComponent<HelperScript>();
     }
 
     public bool ExtendedRayCollisionCheck(float xoffs, float yoffs)
@@ -44,6 +50,7 @@ public class PlayerScript : MonoBehaviour
 
         if (hit.collider != null)
         {
+           
             print("Player has collided with Ground layer");
             hitColor = Color.green;
             hitSomething = true;
@@ -68,30 +75,18 @@ public class PlayerScript : MonoBehaviour
         if (Input.GetKey("a") || Input.GetKey(KeyCode.LeftArrow))
         {
             xvel = -6;
-            isRight = false;
+            helper.DoFlipObject(true);
+            ExtendedRayCollisionCheck(0.5f, 0);
             anim.SetBool("isRunning", true);
         }
 
         if (Input.GetKey("d") || Input.GetKey(KeyCode.RightArrow))
         {
             xvel = 6;
-            isRight = true;
+            helper.DoFlipObject(false);
+            ExtendedRayCollisionCheck(-0.5f, 0);
             anim.SetBool("isRunning", true);
         }
-
-        if (isRight == false)
-        {
-            spriteRenderer.flipX= true;
-            ExtendedRayCollisionCheck(0.5f, 0);
-        }
-        else
-        {
-            spriteRenderer.flipX = false;
-            ExtendedRayCollisionCheck(-0.5f, 0);
-        }
-
-
-
 
         //do ground check
 
@@ -125,18 +120,37 @@ public class PlayerScript : MonoBehaviour
 
         rb.linearVelocity = new Vector3(xvel, yvel, 0);
 
+        if(lives == 0)
+        {
+            SceneManager.LoadScene("LVL_1");
+            lives = 3;
+        }
+
+        if(health == 0)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            lives = lives - 1;
+
+        }
+
     }
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.tag == "Enemy" || other.gameObject.tag == "Lava")
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
+        if (other.gameObject.tag == "Enemy")
+            {
+                health = health - 1;
+            }
+
+        if (other.gameObject.tag == "Lava")
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            }
+        
         if (other.gameObject.tag == "Finish")
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        }
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            }
     }
 
    
